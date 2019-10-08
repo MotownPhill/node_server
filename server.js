@@ -1,17 +1,16 @@
 // set up ========================
-require('rootpath')();
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const basicAuth = require('_helpers/basic-auth');
-const errorHandler = require('_helpers/error-handler');
+//const basicAuth = require('_helpers/basic-auth');
+//const errorHandler = require('_helpers/error-handler');
 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-
 
 const employees = [
     {
@@ -53,13 +52,13 @@ const employees = [
 ];
 
 // use basic HTTP auth to secure the api
-app.use(basicAuth);
+// app.use(basicAuth);
 
 // api routes
 app.use('/users', require('./users/users.controller'));
 
 // global error handler
-app.use(errorHandler);
+//app.use(errorHandler);
 //
 //
 // app.use(function (req, res, next) {
@@ -92,13 +91,16 @@ app.get('/getEmployees', function (req, res) {
 
 
 app.get('/getEmployee', function (req, res) {
-    console.log("req", req);
+    console.log("req", req.query);
     let key = req.query.param;
     let employee = employees.find((emp) => {
         return emp.key == key;
     });
     res.send(employee);
 });
+
+
+
 
 // app.put('/authenticate', function (req, res) {
 //     console.log("authenticate request", req.body);

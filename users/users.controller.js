@@ -2,6 +2,8 @@
 const router = express.Router();
 const userService = require('./user.service');
 
+
+// local:8081/users/authenticate
 // routes
 router.post('/authenticate', authenticate);
 router.get('/get', getAll);

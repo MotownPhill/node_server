@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const basicAuth = require('_helpers/basic-auth');
 const errorHandler = require('_helpers/error-handler');
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
@@ -62,7 +61,7 @@ let employees = [];
 app.use('/users', require('./users/users.controller'));
 
 // global error handler
-app.use(errorHandler);
+//app.use(errorHandler);
 //
 //
 // app.use(function (req, res, next) {
@@ -97,8 +96,8 @@ app.get('/getEmployees', async function (req, res) {
     // cursor.each(function (err, doc) {
     //     employees.push(doc);
     //     console.log("doc1", doc);
-
     // });
+
     console.log("employees", employees);
     client.close();
     res.send(employees);
@@ -107,19 +106,19 @@ app.get('/getEmployees', async function (req, res) {
 });
 
 
-app.get('/getEmployee', async function (req, res) {
-    let employee = {};
+app.post('/updateEmployee', async function (req, res) {
+    //var employee = {};
     //console.log("req", req);
     console.log("param", req.query);
-
-    let key = parseIntreq.query.key;
+    let employee = req.body;
+    console.log("employee ---", employee);
+    let key = parseInt(req.query.key);
     const client = await MongoClient.connect(url);
 
     var db = client.db("EmployeeDB");
     console.log("key ---", key);
-    employee = db.collection('employees').find({ key: 1 }).toArray(function (err, document) {
-        console.log("document", document);
-    });
+    employee = await db.collection('employees').updateOne({ key: key },
+        { $set: employee });
     console.log("employee ---", employee);
 
     // let employee = employees.find((emp) => {
@@ -127,9 +126,6 @@ app.get('/getEmployee', async function (req, res) {
     // });
     res.send(employee);
 });
-
-
-
 
 // app.put('/authenticate', function (req, res) {
 //     console.log("authenticate request", req.body);
@@ -153,24 +149,16 @@ app.delete('/deleteEmployee', function (req, res) {
     //console.log("id value",req.query);
 })
 
-app.put('/addEmployee', function (req, res) {
+app.put('/addEmployee', async function (req, res) {
     console.log("add employees", req.body);
-
+    const client = await MongoClient.connect(url);
     let employee = req.body;
-    console.log("employees", employees);
-    employee["key"] = employees[employees.length - 1]["key"] + 1;
-    employees.push(employee);
-
-    console.log(employee, employee.name);
-    res.send(employees);
-
+    console.log("employee ---", employee);
+    var db = client.db("EmployeeDB");
+    let result = await db.collection('employees').insertOne(employee);
+    console.log("result ---", result);
+    res.send(result);
 });
 
-
-// app.get('*', function (req, res) {
-//     res.sendfile('./public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
-// });
-
-// listen (start app with node server.js) ======================================
 app.listen(8081);
 console.log("App listening on port 8081");
